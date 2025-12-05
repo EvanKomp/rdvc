@@ -1,9 +1,6 @@
-# Install Python environment
-echo "Install Python environment."
-./init_python_venv.sh
-
-echo "Activate Python environment."
-source ./.venv/bin/activate
+# Install and activate Python environment
+echo "Install and activate Python environment."
+source ./init_python_venv.sh
 
 # Setup links for the DVC cache shared among jobs and projects
 dvc config --local cache.type hardlink,symlink,copy
@@ -18,7 +15,10 @@ function cleanup_dvc(){
         echo "Job successfully finished."
     fi
 
-    deactivate
+    # Deactivate Python environment (works for both conda and virtualenv)
+    if command -v deactivate &> /dev/null; then
+        deactivate || true
+    fi
     cleanup_job_dir
 }
 

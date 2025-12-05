@@ -24,6 +24,7 @@ class OptionGroup:
 CLUSTER_OPTIONS: Dict[str, Dict[str, Any]] = {
     "host": {"required": True, "show_default": True, "help": "SLURM cluster address"},
     "username": {"required": True, "show_default": True, "help": "SLURM cluster username"},
+    "rdvc-dir": {"required": False, "show_default": True, "default": "~/.rdvc", "help": "remote rdvc directory"},
 }
 
 INSTANCE_OPTIONS: Dict[str, Dict[str, Any]] = {
@@ -34,6 +35,7 @@ INSTANCE_OPTIONS: Dict[str, Dict[str, Any]] = {
 }
 
 SBATCH_OPTIONS: Dict[str, Dict[str, Any]] = {
+    "account": {"show_default": True, "help": "account to charge for job"},
     "begin": {"show_default": True, "help": "submit now but defer job until specified time"},
     "comment": {"show_default": True, "help": "arbitrary comment"},
     "deadline": {"show_default": True, "help": "remove job if no ending is possible before deadline"},
@@ -84,6 +86,14 @@ def get_global_rdvc_config_path() -> Path:
 
 def get_project_rdvc_config_path(path: Optional[Path] = None) -> Path:
     return get_git_root(path) / ".rdvc/config.toml"
+
+
+def get_rdvc_dir() -> str:
+    """Get the configured rdvc directory path, defaulting to ~/.rdvc."""
+    cli_defaults = get_cli_defaults()
+    if not cli_defaults:
+        return "~/.rdvc"
+    return cli_defaults.get("run", {}).get("rdvc_dir", "~/.rdvc")
 
 
 def get_cli_defaults() -> Dict[str, Any]:

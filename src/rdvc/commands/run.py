@@ -67,6 +67,9 @@ def run(
     sbatch_key_value_options, sbatch_flag_options = cli_options.get_options_from_context(ctx, "sbatch")
     instance_key_value_options, _ = cli_options.get_options_from_context(ctx, "instance")
 
+    # Get rdvc_dir from cluster options (it may have been set via config)
+    rdvc_dir = cluster_key_value_options.get("rdvc_dir", "~/.rdvc")
+
     instance = InstanceTypes.from_name(instance_key_value_options["instance"])
 
     sbatch_script = render_template(
@@ -77,11 +80,12 @@ def run(
         instance_key_value_options=instance.to_key_value_options(),
         instance_flag_options=instance.to_flag_options(),
         dvc_exp_run_pull=pull,
-        dvc_exp_run_options=args
+        dvc_exp_run_options=args,
+        rdvc_dir=rdvc_dir
     )
 
     host = cluster_key_value_options["host"]
     username = cluster_key_value_options.get("username", None)
     with SSHClient(host=host, username=username) as client:
-        check_rdvc_init(client)
-        submit_remote(client, sbatch_script)
+        check_rdvc_init(client, rdvc_dir)
+        submit_remote(client, sbatch_script, rdvc_dir)

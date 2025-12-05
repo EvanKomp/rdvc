@@ -104,9 +104,9 @@ class SSHClient:
         return tmpdir
 
     def move(self, old_path: str, new_path: str) -> Tuple[int, str, str]:
-        return self._exec_command(f"mv {old_path} {new_path}")
+        return self._exec_command(f"cp {old_path} {new_path} && rm {old_path}")
 
     def submit_sbatch(self, sbatch_file_path: str) -> str:
-        sbatch_cmd = "/opt/slurm/bin/sbatch"
+        sbatch_cmd = "sbatch"
         _, job_id, _ = self._exec_command(f"{sbatch_cmd} --parsable {sbatch_file_path}", print_stdout=False)
         return job_id

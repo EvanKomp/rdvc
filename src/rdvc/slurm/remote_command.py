@@ -8,8 +8,15 @@ from rdvc.slurm.ssh_client import SSHClient
 log = logging.getLogger("rdvc")
 
 
-def submit_remote(client: SSHClient, sbatch_script: str) -> None:
-    submissions_dir = Path(".rdvc/submissions")
+def submit_remote(client: SSHClient, sbatch_script: str, rdvc_dir: str = "~/.rdvc") -> None:
+    """Submit an sbatch script to the remote SLURM cluster.
+    
+    Args:
+        client: SSH client connection to remote host
+        sbatch_script: The sbatch script content to submit
+        rdvc_dir: Path to the rdvc directory on the remote host (default: ~/.rdvc)
+    """
+    submissions_dir = Path(rdvc_dir) / "submissions"
     sbatch_script_fo = io.BytesIO(sbatch_script.encode("utf-8"))
     temp_sbatch_path = client.make_tmpdir("rdvc-sbatch-XXXXXXXXXX")
 

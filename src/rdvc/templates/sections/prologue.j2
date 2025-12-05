@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --output=".rdvc/logs/slurm-%j.out"
+#SBATCH --output="{{ rdvc_dir }}/logs/slurm-%j.out"
 {% for option, value in sbatch_key_value_options.items() if value -%}
 #SBATCH --{{ option|replace("_", "-") }}={{ value }}
 {% endfor -%}
@@ -26,7 +26,7 @@ export RDVC_JOB_REPO_URL="{{job_repo.url}}"
 export RDVC_JOB_REPO_BRANCH="{{job_repo.branch}}"
 export RDVC_JOB_REPO_REV="{{job_repo.rev}}"
 
-export RDVC_DIR="${RDVC_DIR:-${HOME}/.rdvc}"
+export RDVC_DIR="${RDVC_DIR:-{{ rdvc_dir }}}"
 
 # Prepare a directory for the current job
 export RDVC_JOB_WORKSPACE_DIR="/tmp/rdvc-${SLURM_JOB_ID}"

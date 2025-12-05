@@ -25,10 +25,15 @@ class RDvcInitError(Exception):
         super().__init__(self.message)
 
 
-def check_rdvc_init(client: SSHClient) -> None:
-    """Check for existence of rDVC directories on the remote host."""
+def check_rdvc_init(client: SSHClient, rdvc_dir: str = "~/.rdvc") -> None:
+    """Check for existence of rDVC directories on the remote host.
+    
+    Args:
+        client: SSH client connection to remote host
+        rdvc_dir: Path to the rdvc directory on the remote host (default: ~/.rdvc)
+    """
     log.info("Checking that rDVC directories exist on the remote host.")
-    remote_dirs = client.listdir(".rdvc")
+    remote_dirs = client.listdir(rdvc_dir)
 
     if not set(REMOTE_RDVC_DIRECTORIES).issubset(remote_dirs):
         raise RDvcInitError(remote_dirs)

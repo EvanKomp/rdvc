@@ -19,10 +19,11 @@ def make_global_rdvc_config(global_rdvc_config_path: Path) -> None:
     global_rdvc_config_path.parent.mkdir(parents=True, exist_ok=True)
 
     host = click.prompt("Enter SLURM host address")
+    username = click.prompt("Enter SLURM cluster username")
     email = click.prompt("(Optional) Enter an e-mail address for SLURM notifications", default="")
 
     mail_config = {"mail-user": email, "mail-type": "END,FAIL"} if len(email) > 0 else {}
-    basic_config = {"cluster": {"host": host}, "run": mail_config}
+    basic_config = {"cluster": {"host": host, "username": username}, "run": mail_config}
 
     with open(global_rdvc_config_path, "wb") as f:
         tomli_w.dump(basic_config, f)
@@ -89,10 +90,11 @@ def remote(
     init_options = cli_options.get_cli_defaults()["init"]
     host = init_options["host"]
     username = init_options["username"]
+    rdvc_dir = init_options.get("rdvc_dir", "~/.rdvc")
 
     with SSHClient(host, username=username) as client:
-        log.info("Generating remote directories if missing.")
-        remote_directories_command = f"mkdir -p .rdvc/{{{','.join(REMOTE_RDVC_DIRECTORIES)}}}"
+        log.info(f"Generating remote directories if missing in {rdvc_dir}.")
+        remote_directories_command = f"mkdir -p {rdvc_dir}/{{{','.join(REMOTE_RDVC_DIRECTORIES)}}}"
         client.mkdir(remote_directories_command)
 
 
